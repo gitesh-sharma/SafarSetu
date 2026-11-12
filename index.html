@@ -1,12 +1,80 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SafarSetu – Every journey, live and clear</title>
 <meta name="description" content="India public transport information on one map. Clear data status: live, scheduled or demo.">
-<link rel="canonical" href="https://safarsetu.pages.dev/"><link rel="icon" href="/assets/img/logo.png">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"><link rel="stylesheet" href="/assets/css/style.css"></head><body>
-<header><a class="brand" href="/"><img src="/assets/img/logo.png" alt="SafarSetu logo">SafarSetu</a>
-<nav><a href="/" data-t="home">Map</a><a href="/data-sources/" data-t="data">Data sources</a></nav>
+<link rel="icon" href="assets/img/logo.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>:root{--bg:#fff;--fg:#14213d;--mut:#5b6678;--pri:#0b5fff;--bd:#d9dee7;--card:#f5f7fb;--live:#0a7d33;--est:#8a5a00;--sch:#0b5fff;--una:#6b7280;--dem:#9333ea;--stale:#b42318}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1420;--fg:#e8edf6;--mut:#a3adbf;--pri:#6ea0ff;--bd:#27324a;--card:#161f31}}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,"Noto Sans Devanagari",sans-serif;background:var(--bg);color:var(--fg)}
+header{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;padding:.6rem 1rem;border-bottom:1px solid var(--bd)}
+.brand{display:flex;align-items:center;gap:.5rem;font-weight:700;color:inherit;text-decoration:none}.brand img{height:32px}
+nav{display:flex;gap:1rem;flex:1}nav a{color:var(--fg);text-decoration:none}nav a:hover,a:focus-visible{text-decoration:underline}
+button,select,input{font:inherit;color:inherit;background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:.4rem .7rem}
+main{display:grid;grid-template-columns:340px 1fr;height:calc(100vh - 58px)}
+aside{padding:1rem;overflow:auto;border-right:1px solid var(--bd)}#map{min-height:300px}
+#q{width:100%}ul.res{list-style:none;padding:0;margin:.5rem 0}ul.res li button{width:100%;text-align:left;margin:.2rem 0}
+.badge{display:inline-block;padding:0 .5rem;border-radius:999px;font-size:.75rem;font-weight:700;color:#fff}
+.LIVE{background:var(--live)}.ESTIMATED{background:var(--est)}.SCHEDULED{background:var(--sch)}.UNAVAILABLE{background:var(--una)}.DEMO{background:var(--dem)}.STALE{background:var(--stale)}
+.note{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:.6rem;font-size:.9rem;color:var(--mut)}
+.page{max-width:760px;margin:1rem auto;padding:0 1rem}
+@media(max-width:760px){main{grid-template-columns:1fr;grid-template-rows:auto 60vh;height:auto}aside{border:0}}
+
+body.ds main{display:none}body:not(.ds) .page{display:none}</style></head><body>
+<header><a class="brand" href="#"><img src="assets/img/logo.png" alt="SafarSetu logo">SafarSetu</a>
+<nav><a href="#" data-t="home">Map</a><a href="#data-sources" data-t="data">Data sources</a></nav>
 <select id="lang" aria-label="Language"><option value="en">English</option><option value="hi">हिन्दी</option></select></header>
-<main><aside><p class="note" data-t="demo"></p><label for="q" class="sr" hidden></label>
-<input id="q" type="search" data-t="search" aria-label="Search" autocomplete="off"><div id="list" aria-live="polite"></div></aside><div id="map" role="application" aria-label="India map"></div></main>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script><script type="module" src="/assets/js/app.js"></script>
-<script type="module">import{t}from"/assets/js/i18n.js";const i=document.getElementById("q");i.placeholder=t("search")</script></body></html>
+<main><aside><p class="note" data-t="demo"></p>
+<input id="q" type="search" aria-label="Search" autocomplete="off"><div id="list" aria-live="polite"></div></aside><div id="map" role="application" aria-label="India map"></div></main>
+<div class="page"><h1 data-t="data">Data sources</h1>
+<p><span class="badge LIVE">LIVE</span> verified current position from an authorized source · <span class="badge STALE">STALE</span> live source older than its freshness limit · <span class="badge ESTIMATED">ESTIMATED</span> calculated from permitted data · <span class="badge SCHEDULED">SCHEDULED</span> timetable · <span class="badge UNAVAILABLE">UNAVAILABLE</span> no reliable data · <span class="badge DEMO">DEMO</span> sample data.</p>
+<h2>Current limitations</h2><ul><li>No integration is live yet. All map data is DEMO.</li><li>Indian Railways has no known free, official public live-tracking API; live train status needs an authorized provider.</li><li>Map: © OpenStreetMap contributors. Official boundary layer pending verification.</li><li>No user accounts. No personal data is collected.</li></ul>
+<p>Provider list: <a href="providers/registry.json">registry.json</a></p></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script type="module">
+const T={
+en:{home:"Map",data:"Data sources",search:"Search stations or routes",none:"No results found.",tag:"Every journey, live and clear.",
+demo:"All data shown is DEMO sample data. No live positions are available yet.",updated:"Last update",src:"Source",
+LIVE:"LIVE",ESTIMATED:"ESTIMATED",SCHEDULED:"SCHEDULED",UNAVAILABLE:"UNAVAILABLE",DEMO:"DEMO",STALE:"STALE",
+mapfail:"Map could not load. Check your network and retry.",lang:"Language",stations:"Stations",routes:"Routes"},
+hi:{home:"नक्शा",data:"डेटा स्रोत",search:"स्टेशन या मार्ग खोजें",none:"कोई परिणाम नहीं मिला।",tag:"हर सफ़र, लाइव और स्पष्ट।",
+demo:"दिखाया गया सारा डेटा DEMO नमूना डेटा है। अभी कोई लाइव लोकेशन उपलब्ध नहीं है।",updated:"अंतिम अपडेट",src:"स्रोत",
+LIVE:"लाइव",ESTIMATED:"अनुमानित",SCHEDULED:"निर्धारित",UNAVAILABLE:"अनुपलब्ध",DEMO:"डेमो",STALE:"पुराना",
+mapfail:"नक्शा लोड नहीं हो सका। नेटवर्क जाँचकर पुनः प्रयास करें।",lang:"भाषा",stations:"स्टेशन",routes:"मार्ग"}};
+const FRESH_MIN={train:5,road:2};
+const getLang=()=>localStorage.getItem("lang")||"en";
+const setLang=l=>{localStorage.setItem("lang",l);location.reload()};
+const t=k=>T[getLang()][k]||k;
+// A LIVE record older than its threshold is shown as STALE, never as LIVE.
+function effStatus(status,type,ts){if(status!=="LIVE")return status;
+ const age=(Date.now()-new Date(ts).getTime())/6e4;return age>(FRESH_MIN[type]||5)?"STALE":"LIVE"}
+function chrome(active){const l=getLang();document.documentElement.lang=l;
+ document.querySelectorAll("[data-t]").forEach(e=>e.textContent=t(e.dataset.t));
+ const s=document.getElementById("lang");if(s){s.value=l;s.onchange=()=>setLang(s.value)}}
+
+chrome();
+const route=()=>{document.body.classList.toggle("ds",location.hash==="#data-sources");if(window.map)setTimeout(()=>window.map.invalidateSize(),50)};
+addEventListener("hashchange",route);route();
+document.getElementById("q").placeholder=t("search");
+const L=getLang(),el=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";");
+const badge=s=>`<span class="badge ${s}">${t(s)}</span>`;
+const D={"status": "DEMO", "note": "Sample data for UI demonstration only. Not real-time. Coordinates approximate.", "stations": [{"code": "NDLS", "en": "New Delhi", "hi": "नई दिल्ली", "lat": 28.6425, "lng": 77.2197}, {"code": "PNBE", "en": "Patna Junction", "hi": "पटना जंक्शन", "lat": 25.6012, "lng": 85.1376}, {"code": "SV", "en": "Siwan Junction", "hi": "सीवान जंक्शन", "lat": 26.22, "lng": 84.356}, {"code": "HWH", "en": "Howrah Junction", "hi": "हावड़ा जंक्शन", "lat": 22.5839, "lng": 88.3426}, {"code": "CSMT", "en": "Mumbai CSMT", "hi": "मुंबई सीएसएमटी", "lat": 18.94, "lng": 72.8355}, {"code": "MAS", "en": "Chennai Central", "hi": "चेन्नई सेंट्रल", "lat": 13.0827, "lng": 80.2755}], "routes": [{"id": "demo-1", "type": "train", "en": "Demo Route: Delhi – Patna – Howrah", "hi": "डेमो मार्ग: दिल्ली – पटना – हावड़ा", "stations": ["NDLS", "PNBE", "HWH"], "status": "DEMO"}, {"id": "demo-2", "type": "train", "en": "Demo Route: Siwan – Patna", "hi": "डेमो मार्ग: सीवान – पटना", "stations": ["SV", "PNBE"], "status": "DEMO"}]};
+let map;try{map=window.L.map("map").setView([22.5,79],5);
+ window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(map)}
+catch{el("map").innerHTML=`<p class="note">${t("mapfail")}</p>`}
+const byCode=Object.fromEntries(D.stations.map(s=>[s.code,s])),name=o=>o[L]||o.en,markers={};
+D.stations.forEach(s=>{if(!map)return;markers[s.code]=window.L.marker([s.lat,s.lng]).addTo(map)
+ .bindPopup(`<b>${esc(name(s))}</b> (${esc(s.code)})<br>${badge(effStatus("DEMO","train"))}`)});
+const items=[...D.stations.map(s=>({k:"s",id:s.code,label:`${name(s)} (${s.code})`,hay:`${s.en} ${s.hi} ${s.code}`.toLowerCase()})),
+ ...D.routes.map(r=>({k:"r",id:r.id,label:name(r),hay:`${r.en} ${r.hi}`.toLowerCase()}))];
+function show(q){q=q.trim().toLowerCase();const r=items.filter(i=>!q||i.hay.includes(q));
+ el("list").innerHTML=r.length?`<ul class="res">${r.map(i=>`<li><button data-k="${i.k}" data-id="${esc(i.id)}">${esc(i.label)} ${badge("DEMO")}</button></li>`).join("")}</ul>`:`<p class="note">${t("none")}</p>`}
+el("q").oninput=e=>show(e.target.value);
+el("list").onclick=e=>{const b=e.target.closest("button");if(!b||!map)return;
+ if(b.dataset.k==="s"){const s=byCode[b.dataset.id];map.setView([s.lat,s.lng],10);markers[s.code].openPopup()}
+ else{const r=D.routes.find(x=>x.id===b.dataset.id),pts=r.stations.map(c=>[byCode[c].lat,byCode[c].lng]);
+  window.L.polyline(pts,{dashArray:"6 6"}).addTo(map);map.fitBounds(pts)}};
+show("");
+
+window.map=map;
+</script></body></html>
