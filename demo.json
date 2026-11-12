@@ -1,0 +1,11 @@
+{"status":"DEMO","note":"Sample data for UI demonstration only. Not real-time. Coordinates approximate.",
+"stations":[
+{"code":"NDLS","en":"New Delhi","hi":"नई दिल्ली","lat":28.6425,"lng":77.2197},
+{"code":"PNBE","en":"Patna Junction","hi":"पटना जंक्शन","lat":25.6012,"lng":85.1376},
+{"code":"SV","en":"Siwan Junction","hi":"सीवान जंक्शन","lat":26.2200,"lng":84.3560},
+{"code":"HWH","en":"Howrah Junction","hi":"हावड़ा जंक्शन","lat":22.5839,"lng":88.3426},
+{"code":"CSMT","en":"Mumbai CSMT","hi":"मुंबई सीएसएमटी","lat":18.9400,"lng":72.8355},
+{"code":"MAS","en":"Chennai Central","hi":"चेन्नई सेंट्रल","lat":13.0827,"lng":80.2755}],
+"routes":[
+{"id":"demo-1","type":"train","en":"Demo Route: Delhi – Patna – Howrah","hi":"डेमो मार्ग: दिल्ली – पटना – हावड़ा","stations":["NDLS","PNBE","HWH"],"status":"DEMO"},
+{"id":"demo-2","type":"train","en":"Demo Route: Siwan – Patna","hi":"डेमो मार्ग: सीवान – पटना","stations":["SV","PNBE"],"status":"DEMO"}]}

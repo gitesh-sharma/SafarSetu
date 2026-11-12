@@ -1,0 +1,5 @@
+{"_note":"Provider registry. Status 'pending' = permission/terms not verified. No integration is live until verified.",
+"providers":[
+{"name":"Indian Railways timetable (open datasets, e.g. data.gov.in)","category":"rail-static","status":"pending","permissions":"verify licence","updateFrequency":"static","attribution":"TBD","health":"n/a"},
+{"name":"Authorized live train provider","category":"rail-live","status":"pending","permissions":"no free official public API known","updateFrequency":"TBD","attribution":"TBD","health":"n/a"},
+{"name":"Open GTFS-Realtime bus feed (pilot city/state)","category":"road-live","status":"pending","permissions":"verify terms","updateFrequency":"TBD","attribution":"TBD","health":"n/a"}]}

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://safarsetu.pages.dev/sitemap.xml
